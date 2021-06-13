@@ -1,0 +1,60 @@
+version: '3'
+
+networks:
+  test-network:
+
+services:
+  site:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    container_name: test_nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./src:/var/www
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+      - mariadb
+    networks:
+      - test-network
+
+  mariadb:
+    image: mariadb:10.4.12
+    container_name: test_mariadb
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: test
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    networks:
+      - test-network
+
+  php:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    container_name: test_php
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 9000:9000
+    volumes:
+      - ./src:/var/www
+    networks:
+      - test-network
+
+  composer:
+    container_name: test_composer
+    image: composer
+    volumes:
+      - ./src:/app
+    command: composer install --ignore-platform-reqs
