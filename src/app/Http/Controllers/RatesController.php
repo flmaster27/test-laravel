@@ -26,6 +26,7 @@ class RatesController extends Controller
             ->allowedFilters([
                 AllowedFilter::exact('currency', 'name'),
             ])
+            ->defaultSort('rate')
             ->get();
 
         return CurrencyResource::collection($currencies);
