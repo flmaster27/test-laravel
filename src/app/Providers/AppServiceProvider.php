@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Http\Resources\CurrencyResource;
+use App\Repositories\TickerBlockchainRepository;
+use App\Repositories\TickerRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +16,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        CurrencyResource::withoutWrapping();
+
+        $this->app->bind(
+            TickerRepositoryInterface::class,
+            TickerBlockchainRepository::class
+        );
     }
 
     /**
